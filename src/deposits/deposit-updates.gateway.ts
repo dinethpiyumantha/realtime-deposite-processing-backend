@@ -36,7 +36,7 @@ export class DepositUpdatesGateway
     walletAddress: string,
   ): { ok: boolean; room: string } {
     const room = this.walletRoom(walletAddress);
-    client.join(room);
+    void client.join(room);
     return { ok: true, room };
   }
 
