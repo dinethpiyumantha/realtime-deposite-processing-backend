@@ -1,0 +1,28 @@
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: development
+    container_name: realtime-deposit-app-dev
+    restart: unless-stopped
+    ports:
+      - '3000:3000'
+      - '9229:9229'
+    environment:
+      DATABASE_URL: postgresql://${POSTGRES_USER:-postgres}:${POSTGRES_PASSWORD:-postgres}@db:5432/${POSTGRES_DB:-deposit_db}?schema=public
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
+      API_KEY: ${API_KEY:-dev-api-key}
+      CALLBACK_URL: ${CALLBACK_URL:-https://example.com/webhook}
+    env_file:
+      - .env
+    volumes:
+      - .:/app
+      - /app/node_modules
+      - /app/generated
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_healthy

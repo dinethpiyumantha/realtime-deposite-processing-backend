@@ -1,0 +1,12 @@
+.git
+.husky
+node_modules
+dist
+generated
+coverage
+.env*.local
+*.log
+npm-debug.log*
+README.md
+.dockerignore
+docker-compose*.yml

@@ -1,98 +1,283 @@
-<p align="center">
-  <a href="http://nestjs.com/" target="blank"><img src="https://nestjs.com/img/logo-small.svg" width="120" alt="Nest Logo" /></a>
-</p>
+# Real-time Deposit Processing Backend
 
-[circleci-image]: https://img.shields.io/circleci/build/github/nestjs/nest/master?token=abc123def456
-[circleci-url]: https://circleci.com/gh/nestjs/nest
+> Production-ready NestJS backend for processing cryptocurrency deposits with real-time status updates, async job processing, and reliable callback mechanisms.
 
-  <p align="center">A progressive <a href="http://nodejs.org" target="_blank">Node.js</a> framework for building efficient and scalable server-side applications.</p>
-    <p align="center">
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/v/@nestjs/core.svg" alt="NPM Version" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/l/@nestjs/core.svg" alt="Package License" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/dm/@nestjs/common.svg" alt="NPM Downloads" /></a>
-<a href="https://circleci.com/gh/nestjs/nest" target="_blank"><img src="https://img.shields.io/circleci/build/github/nestjs/nest/master" alt="CircleCI" /></a>
-<a href="https://discord.gg/G7Qnnhy" target="_blank"><img src="https://img.shields.io/badge/discord-online-brightgreen.svg" alt="Discord"/></a>
-<a href="https://opencollective.com/nest#backer" target="_blank"><img src="https://opencollective.com/nest/backers/badge.svg" alt="Backers on Open Collective" /></a>
-<a href="https://opencollective.com/nest#sponsor" target="_blank"><img src="https://opencollective.com/nest/sponsors/badge.svg" alt="Sponsors on Open Collective" /></a>
-  <a href="https://paypal.me/kamilmysliwiec" target="_blank"><img src="https://img.shields.io/badge/Donate-PayPal-ff3f59.svg" alt="Donate us"/></a>
-    <a href="https://opencollective.com/nest#sponsor"  target="_blank"><img src="https://img.shields.io/badge/Support%20us-Open%20Collective-41B883.svg" alt="Support us"></a>
-  <a href="https://twitter.com/nestframework" target="_blank"><img src="https://img.shields.io/twitter/follow/nestframework.svg?style=social&label=Follow" alt="Follow us on Twitter"></a>
-</p>
-  <!--[![Backers on Open Collective](https://opencollective.com/nest/backers/badge.svg)](https://opencollective.com/nest#backer)
-  [![Sponsors on Open Collective](https://opencollective.com/nest/sponsors/badge.svg)](https://opencollective.com/nest#sponsor)-->
+## 📚 Documentation
 
-## Description
+| Document | Description |
+|----------|-------------|
+| [Setup Instructions](./docs/SETUP.md) | Environment setup, development workflow, deployment checklist |
+| [Architecture Overview](./docs/ARCHITECTURE.md) | System design, component details, data flow, technology stack |
+| [API Endpoints](./API_ENDPOINTS.md) | REST API reference and integration guide |
+| [WebSocket Integration](./WEBSOCKET_REALTIME_INTEGRATION.md) | Real-time updates guide for frontend |
 
-[Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
+## Quick Start
+
+```bash
+# Install dependencies
+npm install
+
+# Configure environment
+cp .env.example .env
+
+# Start with Docker
+docker compose -f docker-compose.yml -f docker-compose.dev.yml up --build
+
+# Access endpoints
+# API: http://localhost:3000
+# Swagger Docs: http://localhost:3000/api/docs
+# WebSocket: ws://localhost:3000/deposits
+```
+
+## Features
+
+✅ **Deposit Ingestion** - Idempotent deposit processing via unique transaction hash  
+✅ **Async Processing** - BullMQ job queue with Redis backend  
+✅ **Real-time Updates** - Socket.IO WebSocket for deposit status notifications  
+✅ **Reliable Callbacks** - HTTP webhook callbacks with exponential backoff retries  
+✅ **API Security** - API key authentication on all endpoints  
+✅ **API Documentation** - Swagger UI with OpenAPI spec  
+✅ **Type Safety** - Full TypeScript strict mode  
+✅ **Code Quality** - ESLint + Prettier with pre-commit hooks  
+✅ **Production Ready** - Multi-stage Docker build, database migrations  
+
+## Tech Stack
+
+- **Framework**: NestJS 11 + TypeScript 5.7
+- **Database**: PostgreSQL 16 + Prisma v7
+- **Queue**: BullMQ 5.76 + Redis 7
+- **Real-time**: Socket.IO 4.8
+- **Authentication**: API Key
+- **Documentation**: Swagger/OpenAPI
+- **Containerization**: Docker + Docker Compose
+- **Code Quality**: ESLint 9 + Prettier 3.4 + Husky 9
 
 ## Project setup
 
 ```bash
-$ npm install
+npm install
 ```
 
-## Compile and run the project
+## Development Commands
 
 ```bash
-# development
-$ npm run start
+# Start development server with hot reload
+npm run start:dev
 
-# watch mode
-$ npm run start:dev
+# Build for production
+npm run build
 
-# production mode
-$ npm run start:prod
+# Run linting and auto-fix
+npm run lint
+
+# Format code with Prettier
+npm run format
+
+# Run unit tests
+npm run test
+
+# Run e2e tests
+npm run test:e2e
+
+# Run tests with coverage
+npm run test:cov
 ```
 
-## Run tests
+## Docker Setup
 
 ```bash
-# unit tests
-$ npm run test
+# Development environment with hot reload
+docker compose -f docker-compose.yml -f docker-compose.dev.yml up --build
 
-# e2e tests
-$ npm run test:e2e
+# Production environment
+docker compose up --build
 
-# test coverage
-$ npm run test:cov
+# Fresh start (clear volumes)
+docker compose down -v
+docker compose -f docker-compose.yml -f docker-compose.dev.yml up --build
+
+# View logs
+docker compose logs -f app
+docker compose logs -f db
+docker compose logs -f redis
+
+# Stop all services
+docker compose down
 ```
 
-## Deployment
+## Environment Variables
 
-When you're ready to deploy your NestJS application to production, there are some key steps you can take to ensure it runs as efficiently as possible. Check out the [deployment documentation](https://docs.nestjs.com/deployment) for more information.
+Copy `.env.example` to `.env` and configure:
 
-If you are looking for a cloud-based platform to deploy your NestJS application, check out [Mau](https://mau.nestjs.com), our official platform for deploying NestJS applications on AWS. Mau makes deployment straightforward and fast, requiring just a few simple steps:
+```env
+# Database
+DATABASE_URL=postgresql://postgres:postgres@localhost:5433/deposit_db?schema=public
+POSTGRES_USER=postgres
+POSTGRES_PASSWORD=postgres
+POSTGRES_DB=deposit_db
+
+# Redis
+REDIS_HOST=localhost
+REDIS_PORT=6379
+
+# API Security
+API_KEY=dev-api-key
+
+# Webhook
+CALLBACK_URL=https://example.com/webhook
+```
+
+## Testing API Endpoints
+
+### Create Wallet
 
 ```bash
-$ npm install -g @nestjs/mau
-$ mau deploy
+curl -X POST http://localhost:3000/wallets \
+  -H "x-api-key: dev-api-key" \
+  -H "Content-Type: application/json" \
+  -d '{"address": "wallet-123"}'
 ```
 
-With Mau, you can deploy your application in just a few clicks, allowing you to focus on building features rather than managing infrastructure.
+### List Wallets
 
-## Resources
+```bash
+curl -H "x-api-key: dev-api-key" http://localhost:3000/wallets
+```
 
-Check out a few resources that may come in handy when working with NestJS:
+### Ingest Deposit
 
-- Visit the [NestJS Documentation](https://docs.nestjs.com) to learn more about the framework.
-- For questions and support, please visit our [Discord channel](https://discord.gg/G7Qnnhy).
-- To dive deeper and get more hands-on experience, check out our official video [courses](https://courses.nestjs.com/).
-- Deploy your application to AWS with the help of [NestJS Mau](https://mau.nestjs.com) in just a few clicks.
-- Visualize your application graph and interact with the NestJS application in real-time using [NestJS Devtools](https://devtools.nestjs.com).
-- Need help with your project (part-time to full-time)? Check out our official [enterprise support](https://enterprise.nestjs.com).
-- To stay in the loop and get updates, follow us on [X](https://x.com/nestframework) and [LinkedIn](https://linkedin.com/company/nestjs).
-- Looking for a job, or have a job to offer? Check out our official [Jobs board](https://jobs.nestjs.com).
+```bash
+curl -X POST http://localhost:3000/deposits \
+  -H "x-api-key: dev-api-key" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "walletAddress": "wallet-123",
+    "transactionHash": "0xabc123...",
+    "amount": 100.5
+  }'
+```
 
-## Support
+## Database Management
 
-Nest is an MIT-licensed open source project. It can grow thanks to the sponsors and support by the amazing backers. If you'd like to join them, please [read more here](https://docs.nestjs.com/support).
+```bash
+# View database in Prisma Studio
+npx prisma studio
 
-## Stay in touch
+# Create new migration
+npx prisma migrate dev --name <migration_name>
 
-- Author - [Kamil Myśliwiec](https://twitter.com/kammysliwiec)
-- Website - [https://nestjs.com](https://nestjs.com/)
-- Twitter - [@nestframework](https://twitter.com/nestframework)
+# Apply pending migrations
+npx prisma migrate deploy
+
+# Reset database (⚠️ deletes all data)
+npx prisma migrate reset
+
+# Generate Prisma client
+npx prisma generate
+```
+
+## API Documentation
+
+- **Swagger UI**: http://localhost:3000/api/docs
+- **REST API Guide**: [API_ENDPOINTS.md](./API_ENDPOINTS.md)
+- **WebSocket Guide**: [WEBSOCKET_REALTIME_INTEGRATION.md](./WEBSOCKET_REALTIME_INTEGRATION.md)
+
+## Production Deployment
+
+1. See [Setup Instructions](./docs/SETUP.md) for production checklist
+2. Configure environment variables in `.env` for production
+3. Build Docker image: `docker compose build`
+4. Deploy to your infrastructure
+5. Run migrations: `npx prisma migrate deploy`
+6. Monitor application logs
+
+## Project Structure
+
+```
+src/
+├── common/              # Shared utilities
+│   └── guards/          # API Key authentication
+├── deposits/            # Deposit processing module
+│   ├── deposits.controller.ts
+│   ├── deposits.service.ts
+│   ├── deposits.processor.ts    # BullMQ worker
+│   ├── deposit-updates.gateway.ts # WebSocket
+│   └── dto/
+├── wallets/             # Wallet management module
+│   ├── wallets.controller.ts
+│   ├── wallets.service.ts
+│   └── dto/
+├── prisma/              # Database layer
+│   ├── prisma.service.ts
+│   └── prisma.module.ts
+├── app.module.ts        # Root module
+└── main.ts              # Bootstrap
+
+prisma/
+├── schema.prisma        # Data model
+└── migrations/          # Migration history
+
+docs/
+├── SETUP.md             # Setup instructions
+└── ARCHITECTURE.md      # System architecture
+```
+
+## Code Quality
+
+- **ESLint**: Enforced via pre-commit hooks
+- **Prettier**: Auto-formatting on staged files
+- **Husky**: Git hooks for code quality
+- **TypeScript**: Strict mode enabled
+
+Run locally:
+
+```bash
+npm run lint      # Run ESLint
+npm run format    # Format with Prettier
+npx tsc --noEmit  # Check TypeScript
+```
+
+## Troubleshooting
+
+### Port already in use
+
+```bash
+lsof -i :3000
+lsof -i :5433
+lsof -i :6379
+```
+
+### Database connection issues
+
+```bash
+# Verify services are running
+docker compose ps
+
+# Check database logs
+docker compose logs db
+
+# Restart database
+docker compose restart db
+```
+
+### Fresh environment setup
+
+```bash
+docker compose down -v
+rm -rf node_modules
+npm install
+docker compose -f docker-compose.yml -f docker-compose.dev.yml up --build
+```
+
+## Contributing
+
+1. Create feature branch from `develop`
+2. Make changes and commit (pre-commit hooks run automatically)
+3. Push to remote
+4. Create pull request
+5. Merge after review
 
 ## License
 
-Nest is [MIT licensed](https://github.com/nestjs/nest/blob/master/LICENSE).
+Proprietary - All rights reserved
+
