@@ -1,12 +1,35 @@
 // This is your Prisma schema file,
 // learn more about it in the docs: https://pris.ly/d/prisma-schema
 
-// Get a free hosted Postgres database in seconds: `npx create-db`
-
 generator client {
   provider = "prisma-client-js"
 }
 
 datasource db {
   provider = "postgresql"
+}
+
+// ── Models ────────────────────────────────────────────────────────────────────
+
+model Wallet {
+  address      String        @id @unique
+  createdAt    DateTime      @default(now())
+  transactions Transaction[]
+}
+
+model Transaction {
+  id              String            @id @default(cuid())
+  walletAddress   String
+  transactionHash String            @unique
+  amount          Decimal           @db.Decimal(20, 8)
+  status          TransactionStatus @default(PENDING)
+  createdAt       DateTime          @default(now())
+  updatedAt       DateTime          @updatedAt
+  wallet          Wallet            @relation(fields: [walletAddress], references: [address])
+}
+
+enum TransactionStatus {
+  PENDING
+  PROCESSED
+  FAILED
 }
