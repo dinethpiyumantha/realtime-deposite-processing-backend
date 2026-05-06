@@ -1,3 +1,23 @@
+# ── Stage 0: development ──────────────────────────────────────────────────────
+FROM node:22-alpine AS development
+
+WORKDIR /app
+
+ENV NODE_ENV=development
+
+COPY package*.json ./
+RUN npm ci
+
+COPY prisma ./prisma
+COPY prisma.config.ts ./prisma.config.ts
+RUN npx prisma generate
+
+COPY . .
+
+EXPOSE 3000
+
+CMD ["npm", "run", "start:dev"]
+
 # ── Stage 1: build ────────────────────────────────────────────────────────────
 FROM node:22-alpine AS builder
 
@@ -5,6 +25,10 @@ WORKDIR /app
 
 COPY package*.json ./
 RUN npm ci
+
+COPY prisma ./prisma
+COPY prisma.config.ts ./prisma.config.ts
+RUN npx prisma generate
 
 COPY . .
 RUN npm run build
