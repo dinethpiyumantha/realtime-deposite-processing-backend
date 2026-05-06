@@ -5,6 +5,7 @@ import { Prisma, Transaction } from '@prisma/client';
 import { Job } from 'bullmq';
 import { firstValueFrom } from 'rxjs';
 import { PrismaService } from '../prisma/prisma.service';
+import { DepositUpdatesGateway } from './deposit-updates.gateway';
 import { DEPOSIT_QUEUE } from './deposits.service';
 
 type ProcessJobData = { transactionId: string };
@@ -18,6 +19,7 @@ export class DepositsProcessor extends WorkerHost {
   constructor(
     private readonly prisma: PrismaService,
     private readonly httpService: HttpService,
+    private readonly depositUpdatesGateway: DepositUpdatesGateway,
   ) {
     super();
   }
@@ -59,6 +61,7 @@ export class DepositsProcessor extends WorkerHost {
     if (!updated) return;
 
     this.logger.log(`Processing success: ${updated.transactionHash}`);
+    this.depositUpdatesGateway.emitTransactionProcessed(updated);
 
     await this.sendCallbackWithRetry(updated);
   }
@@ -99,6 +102,11 @@ export class DepositsProcessor extends WorkerHost {
     this.logger.error(
       `Callback failed after ${MAX_CALLBACK_RETRIES} attempts ` +
         `for ${txRecord.transactionHash}: ${lastError?.message}`,
+    );
+
+    this.depositUpdatesGateway.emitCallbackFailed(
+      txRecord,
+      lastError?.message ?? 'Unknown callback error',
     );
   }
 }
