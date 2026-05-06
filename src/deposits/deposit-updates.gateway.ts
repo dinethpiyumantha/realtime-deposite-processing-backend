@@ -20,7 +20,7 @@ export class DepositUpdatesGateway
   private readonly logger = new Logger(DepositUpdatesGateway.name);
 
   @WebSocketServer()
-  private server: Server;
+  private server!: Server;
 
   handleConnection(client: Socket): void {
     this.logger.log(`Socket connected: ${client.id}`);
