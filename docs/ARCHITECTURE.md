@@ -26,8 +26,6 @@ flowchart LR
 		redis[(Redis)]
 	end
 
-	callback[External Callback Endpoint*]
-
 	user --> webapp
 	webapp -->|HTTP requests| api
 	webapp -->|WebSocket subscribe| ws
@@ -40,12 +38,9 @@ flowchart LR
 	worker -->|consume job| queue
 	worker --> prisma
 	worker -->|status events| ws
-	worker -->|HTTP callback| callback
 	ws -->|deposit.processed or callback_failed| state
 	state --> webapp
 ```
-
-*Note: External callback endpoint is assumed to be available and reachable. Configured via `CALLBACK_URL` environment variable.
 
 ## Main Parts
 
