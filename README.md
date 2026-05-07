@@ -6,10 +6,11 @@
 
 | Document | Description |
 |----------|-------------|
-| [Setup Instructions](./docs/SETUP.md) | Environment setup, development workflow, deployment checklist |
-| [Architecture Overview](./docs/ARCHITECTURE.md) | System design, component details, data flow, technology stack |
-| [API Endpoints](./API_ENDPOINTS.md) | REST API reference and integration guide |
-| [WebSocket Integration](./WEBSOCKET_REALTIME_INTEGRATION.md) | Real-time updates guide for frontend |
+| [Setup Instructions](./docs/SETUP.md) | Minimal local setup steps |
+| [API Documentation](./docs/API.md) | Short API summary and Swagger link |
+| [Architecture Explanation](./docs/ARCHITECTURE.md) | Short system overview and request flow |
+| [Design Decisions](./docs/DESIGN_DECISIONS.md) | Key implementation choices |
+| [Assumptions And Limitations](./docs/ASSUMPTIONS_LIMITATIONS.md) | Current constraints and expectations |
 
 ## Quick Start
 
