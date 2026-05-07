@@ -24,11 +24,14 @@ export class DepositsProcessor extends WorkerHost {
     super();
   }
 
+  /**
+   * Processes queued deposit jobs and transitions transactions to PROCESSED.
+   * @param job Queue job containing the transaction identifier.
+   * @returns A promise that resolves after processing and callback handling complete.
+   */
   async process(job: Job<ProcessJobData>): Promise<void> {
     const { transactionId } = job.data;
 
-    // Use a serializable transaction to prevent concurrent processing of the
-    // same record (guards against retried jobs or race conditions).
     const updated = await this.prisma.$transaction(
       async (tx) => {
         const found = await tx.transaction.findUnique({
@@ -47,7 +50,6 @@ export class DepositsProcessor extends WorkerHost {
           return null;
         }
 
-        // Simulate processing work
         await new Promise((resolve) => setTimeout(resolve, 500));
 
         return tx.transaction.update({
@@ -66,6 +68,11 @@ export class DepositsProcessor extends WorkerHost {
     await this.sendCallbackWithRetry(updated);
   }
 
+  /**
+   * Sends the callback payload with exponential-backoff retry behavior.
+   * @param txRecord Processed transaction to send to the callback endpoint.
+   * @returns A promise that resolves after callback success or final failure handling.
+   */
   private async sendCallbackWithRetry(txRecord: Transaction): Promise<void> {
     const callbackUrl =
       process.env.CALLBACK_URL ?? 'https://example.com/webhook';
@@ -85,11 +92,11 @@ export class DepositsProcessor extends WorkerHost {
             { timeout: 5000 },
           ),
         );
-        return; // success
+        return;
       } catch (error: unknown) {
         lastError = error as Error;
         if (attempt < MAX_CALLBACK_RETRIES) {
-          const delay = Math.pow(2, attempt) * 1000; // 2s, 4s
+          const delay = Math.pow(2, attempt) * 1000;
           this.logger.warn(
             `Callback failed (attempt ${attempt}/${MAX_CALLBACK_RETRIES}), ` +
               `retrying in ${delay}ms — ${txRecord.transactionHash}`,

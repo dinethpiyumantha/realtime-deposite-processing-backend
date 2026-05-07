@@ -16,8 +16,12 @@ export class DepositsService {
     @InjectQueue(DEPOSIT_QUEUE) private readonly depositQueue: Queue,
   ) {}
 
+  /**
+   * Validates and stores a deposit request, then queues it for async processing.
+   * @param dto Deposit payload containing wallet address, hash, and amount.
+   * @returns An object containing `idempotent` and the matching transaction.
+   */
   async ingest(dto: CreateDepositDto) {
-    // Verify wallet exists
     const wallet = await this.prisma.wallet.findUnique({
       where: { address: dto.walletAddress },
     });
@@ -27,7 +31,6 @@ export class DepositsService {
       );
     }
 
-    // Idempotency check — ignore duplicate hashes
     const existing = await this.prisma.transaction.findUnique({
       where: { transactionHash: dto.transactionHash },
     });
@@ -38,7 +41,6 @@ export class DepositsService {
       return { idempotent: true, transaction: existing };
     }
 
-    // Persist as PENDING
     const txRecord = await this.prisma.transaction.create({
       data: {
         walletAddress: dto.walletAddress,
@@ -49,7 +51,6 @@ export class DepositsService {
 
     this.logger.log(`Deposit ingested: ${dto.transactionHash}`);
 
-    // Enqueue for async processing
     await this.depositQueue.add(
       DEPOSIT_PROCESS_JOB,
       { transactionId: txRecord.id },

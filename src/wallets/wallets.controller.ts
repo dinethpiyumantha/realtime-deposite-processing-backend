@@ -19,6 +19,11 @@ import { WalletsService } from './wallets.service';
 export class WalletsController {
   constructor(private readonly walletsService: WalletsService) {}
 
+  /**
+   * Registers a new wallet address.
+   * @param dto Wallet payload containing the unique wallet address.
+   * @returns The newly created wallet record.
+   */
   @Post()
   @ApiOperation({ summary: 'Register a new wallet' })
   @ApiCreatedResponse({ description: 'Wallet registered successfully' })
@@ -27,6 +32,10 @@ export class WalletsController {
     return this.walletsService.create(dto);
   }
 
+  /**
+   * Lists all registered wallets.
+   * @returns An array of wallets sorted by creation time.
+   */
   @Get()
   @ApiOperation({ summary: 'List all registered wallets' })
   @ApiOkResponse({ description: 'Array of wallets' })
@@ -34,6 +43,11 @@ export class WalletsController {
     return this.walletsService.findAll();
   }
 
+  /**
+   * Gets one wallet and its transaction history by address.
+   * @param address Wallet address path parameter.
+   * @returns A wallet object including related transactions.
+   */
   @Get(':address')
   @ApiOperation({ summary: 'Get a wallet and its transactions by address' })
   @ApiOkResponse({ description: 'Wallet with transactions' })

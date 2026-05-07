@@ -17,6 +17,11 @@ import { DepositsService } from './deposits.service';
 export class DepositsController {
   constructor(private readonly depositsService: DepositsService) {}
 
+  /**
+   * Accepts a deposit payload and returns the ingestion result.
+   * @param dto Deposit request payload.
+   * @returns An object containing idempotency status and the transaction record.
+   */
   @Post()
   @ApiOperation({
     summary: 'Ingest a deposit',

@@ -22,15 +22,31 @@ export class DepositUpdatesGateway
   @WebSocketServer()
   private server!: Server;
 
+  /**
+   * Logs client connections to the deposits namespace.
+   * @param client Connected socket client.
+   * @returns Nothing.
+   */
   handleConnection(client: Socket): void {
     this.logger.log(`Socket connected: ${client.id}`);
   }
 
+  /**
+   * Logs client disconnect events from the deposits namespace.
+   * @param client Disconnected socket client.
+   * @returns Nothing.
+   */
   handleDisconnect(client: Socket): void {
     this.logger.log(`Socket disconnected: ${client.id}`);
   }
 
   @SubscribeMessage('subscribe.wallet')
+  /**
+   * Subscribes a client to wallet-specific realtime update rooms.
+   * @param client Active socket client.
+   * @param walletAddress Wallet address used to derive the room name.
+   * @returns Subscription status with the room identifier.
+   */
   subscribeWallet(
     @ConnectedSocket() client: Socket,
     walletAddress: string,
@@ -40,6 +56,11 @@ export class DepositUpdatesGateway
     return { ok: true, room };
   }
 
+  /**
+   * Broadcasts a successful transaction processing event.
+   * @param transaction Processed transaction model.
+   * @returns Nothing.
+   */
   emitTransactionProcessed(transaction: Transaction): void {
     const payload = {
       id: transaction.id,
@@ -57,6 +78,12 @@ export class DepositUpdatesGateway
       .emit('deposit.processed', payload);
   }
 
+  /**
+   * Broadcasts callback delivery failures for a transaction.
+   * @param transaction Transaction related to the failed callback.
+   * @param reason Failure reason to include in the event payload.
+   * @returns Nothing.
+   */
   emitCallbackFailed(transaction: Transaction, reason: string): void {
     const payload = {
       walletAddress: transaction.walletAddress,
@@ -72,6 +99,11 @@ export class DepositUpdatesGateway
       .emit('deposit.callback_failed', payload);
   }
 
+  /**
+   * Builds a deterministic Socket.IO room name for a wallet address.
+   * @param walletAddress Wallet address string.
+   * @returns Room name in `wallet:<address>` format.
+   */
   private walletRoom(walletAddress: string): string {
     return `wallet:${walletAddress}`;
   }

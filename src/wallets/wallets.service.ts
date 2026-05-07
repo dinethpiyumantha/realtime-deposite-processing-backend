@@ -13,6 +13,11 @@ export class WalletsService {
 
   constructor(private readonly prisma: PrismaService) {}
 
+  /**
+   * Registers a wallet and maps unique-constraint failures to HTTP conflicts.
+   * @param dto Wallet payload containing the address to register.
+   * @returns The created wallet entity.
+   */
   async create(dto: CreateWalletDto) {
     try {
       const wallet = await this.prisma.wallet.create({
@@ -31,10 +36,19 @@ export class WalletsService {
     }
   }
 
+  /**
+   * Returns all wallets sorted by creation time (newest first).
+   * @returns A list of wallet records.
+   */
   async findAll() {
     return this.prisma.wallet.findMany({ orderBy: { createdAt: 'desc' } });
   }
 
+  /**
+   * Fetches a wallet by address including its transactions.
+   * @param address Wallet address identifier.
+   * @returns Wallet details with related transactions.
+   */
   async findOne(address: string) {
     const wallet = await this.prisma.wallet.findUnique({
       where: { address },

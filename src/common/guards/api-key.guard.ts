@@ -15,6 +15,11 @@ import { Request } from 'express';
 export class ApiKeyGuard implements CanActivate {
   private readonly validKey = process.env.API_KEY ?? 'dev-api-key';
 
+  /**
+   * Validates the incoming x-api-key header against configured credentials.
+   * @param context Execution context containing the incoming HTTP request.
+   * @returns True when the API key matches; otherwise throws UnauthorizedException.
+   */
   canActivate(context: ExecutionContext): boolean {
     const request = context.switchToHttp().getRequest<Request>();
     const key = request.headers['x-api-key'];
