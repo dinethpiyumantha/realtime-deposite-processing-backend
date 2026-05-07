@@ -1,5 +1,50 @@
 # Architecture Explanation
 
+## Full System Diagram
+
+```mermaid
+flowchart LR
+	user[User]
+
+	subgraph frontend[Frontend]
+		webapp[Web App or Admin UI]
+		state[UI State and Realtime Updates]
+	end
+
+	subgraph backend[NestJS Backend]
+		api[REST API Controllers]
+		guard[API Key Guard]
+		service[Wallet and Deposit Services]
+		ws[Socket.IO Gateway]
+		queue[BullMQ Queue]
+		worker[Deposit Processor Worker]
+		prisma[Prisma Service]
+	end
+
+	subgraph data[Infrastructure]
+		postgres[(PostgreSQL)]
+		redis[(Redis)]
+	end
+
+	callback[External Callback Endpoint]
+
+	user --> webapp
+	webapp -->|HTTP requests| api
+	webapp -->|WebSocket subscribe| ws
+	api --> guard
+	guard --> service
+	service --> prisma
+	prisma --> postgres
+	service -->|enqueue job| queue
+	queue --> redis
+	worker -->|consume job| queue
+	worker --> prisma
+	worker -->|status events| ws
+	worker -->|HTTP callback| callback
+	ws -->|deposit.processed or callback_failed| state
+	state --> webapp
+```
+
 ## Main Parts
 
 - NestJS handles HTTP APIs and WebSocket connections.
